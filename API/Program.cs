@@ -1,3 +1,4 @@
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,12 @@ builder.Services.AddDbContext<StoreContext>(opt =>
   opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Adding the ProductRepository as a service so we can inject it to other classes via DI.
+// Using the AddScoped method means that a new instance of the ProductRepository will be created for each HTTP request and will be shared across the different components that are part of that request. This is suitable for repositories that interact with the DbContext, as it ensures that all operations within a single request use the same context instance, maintaining consistency and enabling features like change tracking.
+// When a request comes it will go to the appropriate controller, and if that controller has a constructor parameter of type IProductRepository, the DI container will provide an instance of ProductRepository. The controller can then use this instance to perform data operations related to products. Once the request is completed, the instance will be disposed of.
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+// Other types of service lifetimes include AddSingleton (a single instance is created and shared throughout the application's lifetime) and AddTransient (a new instance is created each time the service is requested and is disposed once the method is completed).
+
 // This line is the seperator between service configuration and app configuration. Everything above this line is configuring services, everything below is configuring the app and this is where we will configure the middlewares.
 // Services are anythimg we will inject into other parts of the application via Dependency Injection (DI). Middlewares are components that form the request pipeline and handle requests and responses.
 
@@ -22,5 +29,21 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.MapControllers();
+
+// Seeding data if needed (adding initial data to the database in case it is empty)
+try
+{
+  // Creating a scope to get the StoreContext service from the DI container. This is necessary because the StoreContext is registered with a scoped lifetime, meaning it is created per request. Since we are outside of an HTTP request context here, we need to create a scope manually to access the StoreContext. When we create a scope, we are essentially creating a new context for dependency injection that allows us to resolve scoped services. After we create the scope, we can request the StoreContext service from the service provider within that scope. When the seeding operation is complete, the scope is disposed of, which also disposes of any scoped services created within it, including the StoreContext.
+  using var scope = app.Services.CreateScope();
+  var services = scope.ServiceProvider;
+  var context = services.GetRequiredService<StoreContext>();
+  await context.Database.MigrateAsync(); // Applying any pending migrations to the database. This ensures that the database schema is up to date with the current model defined in the application before seeding data.
+  await StoreContextSeed.SeedAsync(context); // Calling the SeedAsync method from the StoreContextSeed class to seed the database with initial data if needed.
+}
+catch (Exception ex)
+{
+  System.Console.WriteLine($"Error during migration: {ex.Message}");
+  throw;
+}
 
 app.Run();
