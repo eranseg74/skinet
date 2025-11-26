@@ -21,6 +21,9 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // Other types of service lifetimes include AddSingleton (a single instance is created and shared throughout the application's lifetime) and AddTransient (a new instance is created each time the service is requested and is disposed once the method is completed).
 
+// When registering the Generic repository service, because the type is unknown (type T can be any type) the syntax will be as follows:
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 // This line is the seperator between service configuration and app configuration. Everything above this line is configuring services, everything below is configuring the app and this is where we will configure the middlewares.
 // Services are anythimg we will inject into other parts of the application via Dependency Injection (DI). Middlewares are components that form the request pipeline and handle requests and responses.
 

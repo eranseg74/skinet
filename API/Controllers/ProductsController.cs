@@ -1,6 +1,7 @@
 using System;
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,11 @@ namespace API.Controllers;
 // Automatic model binding means that the framework will automatically map incoming request data to action method parameters based on their names and types. String parameters will be bound from the query string, complex types from the request body, etc.
 [Route("api/[controller]")] // This attribute defines the route template for the controller. The [controller] token is replaced with the name of the controller class, minus the "Controller" suffix. So for ProductsController, the route will be "api/products".
 // The StoreContext is injected into the controller through its constructor. This allows the controller to access the database context and perform operations on the Product entity.
-public class ProductsController(IProductRepository productRepository) : ControllerBase
+// The ProductsController class inherits from ControllerBase, which provides the basic functionality for handling HTTP requests and responses in an API controller.
+// The IGenericRepository<Product> is injected into the controller through its constructor. This allows the controller to access the repository methods for performing CRUD operations on the Product entity.
+// Because the repository is registered as a service in the dependency injection container, ASP.NET Core will automatically provide an instance of the repository when creating the ProductsController.
+// Because the IGenericRepository is a generic interface, it can be reused for different entities, promoting code reusability and separation of concerns. We set it up specifically for the Product entity in this controller.
+public class ProductsController(IGenericRepository<Product> repo) : ControllerBase
 {
   // When a request is made to "api/products", this method will be invoked. The request comes as a thread and the method is asynchronous to avoid blocking the thread while waiting for the database operation to complete. 
   [HttpGet] // This attribute indicates that this action method responds to HTTP GET requests.
@@ -21,13 +26,17 @@ public class ProductsController(IProductRepository productRepository) : Controll
   public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
   {
     // We have to wrap the expression in an Object Result (In this case - the OkActionResult)
-    return Ok(await productRepository.GetProductsAsync(brand, type, sort));
+    // return Ok(await productRepository.GetProductsAsync(brand, type, sort));
+    // Using the generic repository instead of the specific product repository. This will give us an unsorted and unfiltered list of products because the parameters are not used in the generic implementation.
+    var spec = new ProductSpecification(brand, type, sort);
+    var products = await repo.ListAsync(spec);
+    return Ok(products);
   }
 
   [HttpGet("{id:int}")] // This attribute indicates that this action method responds to HTTP GET requests with an integer parameter in the URL. // api/products/3
   public async Task<ActionResult<Product>> GetProduct(int id)
   {
-    var product = await productRepository.GetProductByIdAsync(id);
+    var product = await repo.GetByIdAsync(id);
     if (product == null)
     {
       return NotFound();
@@ -38,8 +47,8 @@ public class ProductsController(IProductRepository productRepository) : Controll
   [HttpPost]
   public async Task<ActionResult<Product>> CreateProduct(Product product)
   {
-    productRepository.AddProduct(product);
-    if (await productRepository.SaveChangesAsync())
+    repo.Add(product);
+    if (await repo.SaveAllAsync())
     {
       // The CreatedAtAction method creates a response with a 201 status code (Created) and includes a Location header with the URI of the newly created resource. It also returns the created product in the response body.
       // The "GetProduct" parameter specifies the action method to use for generating the URI of the newly created product. The new { id = product.Id } parameter provides the route values needed to generate the URI (in this case, the ID of the newly created product that is needed in order to execute the GetProduct -> [HttpGet("{id:int}")]). The product parameter is the content to be returned in the response body.
@@ -57,10 +66,10 @@ public class ProductsController(IProductRepository productRepository) : Controll
       return BadRequest("Can't update product - Id mismatch");
     }
     // Since the product is not being tracked by the context (it was not retrieved from the database in this request), we need to inform the context that this entity has been modified. This tells the entity tracker that what we are passing here is an updated version of an existing entity and that it has been modified.
-    productRepository.UpdateProduct(product);
+    repo.Update(product);
 
     // Save the changes to the database asynchronously. After we defined the entity as modified, we need to call SaveChangesAsync to persist the changes to the database.
-    if (await productRepository.SaveChangesAsync())
+    if (await repo.SaveAllAsync())
     {
       return NoContent();
     }
@@ -71,13 +80,13 @@ public class ProductsController(IProductRepository productRepository) : Controll
   [HttpDelete("{id:int}")]
   public async Task<ActionResult> DeleteProduct(int id)
   {
-    var product = await productRepository.GetProductByIdAsync(id);
+    var product = await repo.GetByIdAsync(id);
     if (product == null)
     {
       return NotFound();
     }
-    productRepository.DeleteProduct(product);
-    if (await productRepository.SaveChangesAsync())
+    repo.Remove(product);
+    if (await repo.SaveAllAsync())
     {
       return NoContent();
     }
@@ -87,17 +96,21 @@ public class ProductsController(IProductRepository productRepository) : Controll
   [HttpGet("brands")]
   public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
   {
-    return Ok(await productRepository.GetBrandsAsync());
+    // return Ok(await productRepository.GetBrandsAsync());
+    var spec = new BrandListSpecification();
+    return Ok(await repo.ListAsync(spec));
   }
 
   [HttpGet("types")]
   public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
   {
-    return Ok(await productRepository.GetTypesAsync());
+    // return Ok(await productRepository.GetTypesAsync());
+    var spec = new TypeListSpecification();
+    return Ok(await repo.ListAsync(spec));
   }
 
   private bool ProductExists(int id)
   {
-    return productRepository.ProductExists(id);
+    return repo.Exists(id);
   }
 }

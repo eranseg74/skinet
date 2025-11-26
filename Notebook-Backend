@@ -73,3 +73,12 @@ LOADING TO GITHUB
 5) Add changes
 6) Commit
 7) Push
+
+DEBUGGING IN VSCODE
+// In the first time we want to run the debugger in VisualStudio Code, we first need to configure the debugger in the `launch.json` file. When we click on the Debug icon we get a link to the `launch.json` file. In the options choose - [C#]. In the launch.json file, clicking on the `Add Configuration` will allow us to choose from various options. Choose 2 options:
+1) `.Net: Attach to a .net process`
+2) `.Net: Launch C# project` - This allows to run the debugger and launch the application at the same time
+
+In the configuration remove the <relative-path-to-project-folder>. The project path should point to the [projname.csproj] file
+In the [name] field in the `.Net: Launch C# project` we can change the name so we will be able to find and select it from the running processes (Here we changed it to API)
+When clicking again on the debugger icon we will see the two configurations we selected. Normally we run the application and then select the `.NetCore Attach` option in order to attach the debugger to the running application
