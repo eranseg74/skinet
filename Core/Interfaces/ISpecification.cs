@@ -13,6 +13,12 @@ public interface ISpecification<T>
   Expression<Func<T, object>>? OrderByDescending { get; } // Sorting criteria for descending order. Similar to OrderBy, but specifies that the sorting should be done in descending order.
 
   bool IsDistinct { get; } // Indicates whether the query should return distinct results. If set to true, the query will eliminate duplicate entries from the result set.
+
+  int Take { get; } // Number of records to take for pagination. This property specifies how many records should be retrieved from the data source when pagination is applied.
+  int Skip { get; } // Number of records to skip for pagination. This property specifies how many records should be skipped before starting to take records for pagination.
+  bool IsPagingEnabled { get; } // Indicates whether pagination is enabled. If set to true, the Take and Skip properties will be used to paginate the results.
+
+  IQueryable<T> ApplyCriteria(IQueryable<T> query); // Method to apply the specification to a given query. This method takes an IQueryable of type T as input and applies the criteria, sorting, and pagination defined in the specification to it. It returns the modified IQueryable with the specification applied. This allows for dynamic querying based on the defined specification.
 }
 
 // If we want to return a different type than the entity type T, we can create another interface that inherits from this one and adds a generic type parameter for the return type. For now, we will keep it simple with just one generic type parameter T.

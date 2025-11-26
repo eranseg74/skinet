@@ -16,4 +16,5 @@ public interface IGenericRepository<T> where T : BaseEntity
   void Remove(T entity);
   Task<bool> SaveAllAsync();
   bool Exists(int id);
+  Task<int> CountAsync(ISpecification<T> spec); // new method to count entities based on a specification. We need this for pagination so we know how many pages there are.
 }

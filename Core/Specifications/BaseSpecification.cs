@@ -23,6 +23,21 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
   // Indicates whether the query should return distinct results. If set to true, the query will eliminate duplicate entries from the result set. The property has a private setter, so it can only be modified within the class or its derived classes.
   public bool IsDistinct { get; private set; }
 
+  public int Take { get; private set; }
+
+  public int Skip { get; private set; }
+
+  public bool IsPagingEnabled { get; private set; }
+
+  public IQueryable<T> ApplyCriteria(IQueryable<T> query)
+  {
+    if (Criteria != null)
+    {
+      query = query.Where(Criteria);
+    }
+    return query;
+  }
+
   // The expression will be evaluated in the specification evaluator in the generic repository to filter the data accordingly. The evaluator will be in the Infrastructure layer.
 
   // Methods to set the sorting criteria
@@ -39,6 +54,14 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
   protected void ApplyDistinct()
   {
     IsDistinct = true;
+  }
+
+  // Method to apply pagination
+  protected void ApplyPaging(int skip, int take)
+  {
+    Skip = skip;
+    Take = take;
+    IsPagingEnabled = true;
   }
 }
 

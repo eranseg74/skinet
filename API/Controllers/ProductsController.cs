@@ -1,36 +1,31 @@
-using System;
+using API.RequestHelpers;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
-using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-// The Controllers in ASP.NET Core are classes that handle incoming HTTP requests and send back HTTP responses to the client. They are a fundamental part of the MVC (Model-View-Controller) architecture used in ASP.NET Core applications. Controllers are responsible for processing user input, interacting with the model (data), and returning appropriate views or data to the client. The Controllers typically contain action methods that correspond to specific HTTP verbs (GET, POST, PUT, DELETE, etc.) and routes. They are decorated with attributes to define routing and other behaviors. The ControllerBase does not support views, making it suitable for APIs that return data (like JSON) rather than HTML views. In this application the view will be handled by the Angular frontend application.
-[ApiController] // This attribute indicates that the class is an API controller. It enables several features such as automatic model validation and binding source parameter inference.
-// Automatic model binding means that the framework will automatically map incoming request data to action method parameters based on their names and types. String parameters will be bound from the query string, complex types from the request body, etc.
-[Route("api/[controller]")] // This attribute defines the route template for the controller. The [controller] token is replaced with the name of the controller class, minus the "Controller" suffix. So for ProductsController, the route will be "api/products".
+
 // The StoreContext is injected into the controller through its constructor. This allows the controller to access the database context and perform operations on the Product entity.
 // The ProductsController class inherits from ControllerBase, which provides the basic functionality for handling HTTP requests and responses in an API controller.
 // The IGenericRepository<Product> is injected into the controller through its constructor. This allows the controller to access the repository methods for performing CRUD operations on the Product entity.
 // Because the repository is registered as a service in the dependency injection container, ASP.NET Core will automatically provide an instance of the repository when creating the ProductsController.
 // Because the IGenericRepository is a generic interface, it can be reused for different entities, promoting code reusability and separation of concerns. We set it up specifically for the Product entity in this controller.
-public class ProductsController(IGenericRepository<Product> repo) : ControllerBase
+public class ProductsController(IGenericRepository<Product> repo) : BaseApiController
 {
   // When a request is made to "api/products", this method will be invoked. The request comes as a thread and the method is asynchronous to avoid blocking the thread while waiting for the database operation to complete. 
   [HttpGet] // This attribute indicates that this action method responds to HTTP GET requests.
   // The Task<ActionResult<IEnumerable<string>>> indicates that this method is asynchronous and returns an ActionResult containing an IEnumerable of strings. ActionResult is a base class for HTTP responses in ASP.NET Core, allowing for various response types (like Ok, NotFound, etc.).
   // The Task part indicates that this method is asynchronous and can be awaited.
-  public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
+  public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams specParams)
   {
     // We have to wrap the expression in an Object Result (In this case - the OkActionResult)
     // return Ok(await productRepository.GetProductsAsync(brand, type, sort));
     // Using the generic repository instead of the specific product repository. This will give us an unsorted and unfiltered list of products because the parameters are not used in the generic implementation.
-    var spec = new ProductSpecification(brand, type, sort);
-    var products = await repo.ListAsync(spec);
-    return Ok(products);
+    var spec = new ProductSpecification(specParams);
+
+    return await CreatePagedResult(repo, spec, specParams.PageIndex, specParams.PageSize);
   }
 
   [HttpGet("{id:int}")] // This attribute indicates that this action method responds to HTTP GET requests with an integer parameter in the URL. // api/products/3
