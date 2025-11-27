@@ -1,3 +1,4 @@
+using API.Middleware;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -24,12 +25,20 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 // When registering the Generic repository service, because the type is unknown (type T can be any type) the syntax will be as follows:
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+// Adding CORS to the application. CORS is a security feature in browsers. Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own. CORS works by adding Access-Control-Allow-* headers to your server's responses. These headers inform the browser which origins (domains), methods (GET, POST, PUT, DELETE), and headers are permitted for cross-origin requests.
+// After defining it here as a service we need to define its middleware. It must be between the exception and the controll mapping middlewares otherwise it might not work!
+builder.Services.AddCors();
+
 // This line is the seperator between service configuration and app configuration. Everything above this line is configuring services, everything below is configuring the app and this is where we will configure the middlewares.
 // Services are anythimg we will inject into other parts of the application via Dependency Injection (DI). Middlewares are components that form the request pipeline and handle requests and responses.
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// MIDDLEWARES
+app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200")); // In the method we need to define what are we allowing. In the WithOrigins we are specifying from where we are allowing the requests to come from. Without these URLs the request will still go to the server but it is the browser that will not display the content (browser security feature)
 
 app.MapControllers();
 
