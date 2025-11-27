@@ -1,0 +1,15 @@
+ANGULAR INSTALLATION
+If using nvm - nvm install [majorVersionNumber] - This will install the latest version of the defined major version
+Using npm - `npm install -g @angular/cli` for installing the latest version. For a specific versio add `@<versionNumber>` after the `cli`
+
+// Creating aa new Angular project: `ng new <project-name>`
+
+// Running angular application on HTTPS
+1) Go to mkcert on GitHub (https://github.com/FiloSottile/mkcert) and follow the installation instructions. To install on Mac run `brew install mkcert`
+2) then, run -> `mkcert -install` to create a new local certificate. If there is a trusted certificate already a message will be displayed - "The local CA is already installed in the system trust store! 👍"
+3) Create a valid certificate for the desired domain. For example, for localhost run `mkcert localhost` (might require sudo permissions)
+4) Configure angular to use the certificate in the angular.json file - under the serve section, below the [builder] key add: `"options": {`
+  `"ssl": true,`
+  `sslCert": "ssl/localhost.pem",` // The location must match the file location (here it is under the <ssl> folder)
+  `"sslKey": "ssl/localhost-key.pem"`
+`},` (without the tic (`) ofcourse)
