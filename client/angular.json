@@ -11,7 +11,11 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
         }
       },
       "root": "",
@@ -30,7 +34,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/tailwind.css", "src/styles.scss"]
+            "styles": ["src/styles.scss", "src/tailwind.css"]
           },
           "configurations": {
             "production": {

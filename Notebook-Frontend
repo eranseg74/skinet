@@ -13,3 +13,21 @@ Using npm - `npm install -g @angular/cli` for installing the latest version. For
   `sslCert": "ssl/localhost.pem",` // The location must match the file location (here it is under the <ssl> folder)
   `"sslKey": "ssl/localhost-key.pem"`
 `},` (without the tic (`) ofcourse)
+
+In order to enable HTTP requests in angular we need first to add the HTTP Client in the app.config.ts file in the app folder under the src folder -> add `provideHttpClient()` to the providers array. Thiswill enable the ability to inject it to the angular components
+
+////// Getting an ERR_CERT_AUTHORITY_INVALID error in the http response ////////////
+The [NET::ERR_CERT_AUTHORITY_INVALID] error indicates that the web browser cannot verify the authenticity of a website's SSL/TLS certificate. This typically means the browser does not trust the Certificate Authority (CA) that issued the certificate, or there's an issue with the certificate chain. Usually it can be solved by cleaning the dev-cert and trust it again by running the following commands:
+`dotnet dev-cert https --clean`
+`dotnet dev-cert https --trust`
+
+HTTP, Observables and RxJS
+
+1. HTTP request, usually from an Angular Service (since they are singeltons)
+2. Receive the Observable and cast it into an items array
+3. Subscribe to the Observable from a component
+4. Assign the items array to a local variable for use in the component's template
+
+RxJS (Reactive Extentions for JavaScript)
+- Utility library for working with Observables, similar to lodash or underscore for javascript objects and arrays.
+- Uses the <pipe()> method to chain RxJS operators together
