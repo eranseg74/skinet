@@ -15,6 +15,7 @@
           "skipTests": true
         },
         "@schematics/angular:service": {
+          "path": "/src/app/core",
           "skipTests": true
         }
       },

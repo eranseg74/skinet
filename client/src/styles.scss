@@ -6,7 +6,6 @@
     (
       filled-container-shape: 6px,
       outlined-container-shape: 6px,
-      outlined-label-text-color: rgb(61, 89, 154),
     )
   );
   @include mat.badge-overrides(
@@ -16,4 +15,8 @@
       container-shape: 50px,
     )
   );
+}
+
+.match-input-height {
+  height: var(--mat-form-field-container-height) !important;
 }
