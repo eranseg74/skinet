@@ -7,3 +7,16 @@ services:
     platform: "linux/amd64"
     ports:
       - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql # setting a name to the volume in order to persist the data even after the container is stopped
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data # setting a name to the volume in order to persist the data even after the container is stopped
+
+# Specifying the DB we are using
+volumes:
+  redis-data:
+  sql-data:

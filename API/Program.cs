@@ -1,7 +1,9 @@
 using API.Middleware;
 using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,15 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 // Adding CORS to the application. CORS is a security feature in browsers. Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own. CORS works by adding Access-Control-Allow-* headers to your server's responses. These headers inform the browser which origins (domains), methods (GET, POST, PUT, DELETE), and headers are permitted for cross-origin requests.
 // After defining it here as a service we need to define its middleware. It must be between the exception and the controll mapping middlewares otherwise it might not work!
 builder.Services.AddCors();
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
+{
+  var connString = builder.Configuration.GetConnectionString("Redis") ?? throw new Exception("Cannot get redis connection string");
+  var configuration = ConfigurationOptions.Parse(connString, true);
+  return ConnectionMultiplexer.Connect(configuration);
+});
+
+builder.Services.AddSingleton<ICartService, CartService>();
 
 // This line is the seperator between service configuration and app configuration. Everything above this line is configuring services, everything below is configuring the app and this is where we will configure the middlewares.
 // Services are anythimg we will inject into other parts of the application via Dependency Injection (DI). Middlewares are components that form the request pipeline and handle requests and responses.

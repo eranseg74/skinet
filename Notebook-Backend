@@ -82,3 +82,13 @@ DEBUGGING IN VSCODE
 In the configuration remove the <relative-path-to-project-folder>. The project path should point to the [projname.csproj] file
 In the [name] field in the `.Net: Launch C# project` we can change the name so we will be able to find and select it from the running processes (Here we changed it to API)
 When clicking again on the debugger icon we will see the two configurations we selected. Normally we run the application and then select the `.NetCore Attach` option in order to attach the debugger to the running application
+
+SQL-SERVER IN DOCKER
+In case we are using SQL-SERVER on Docker we have to set up a volume name. Since all the data will be stored in the dedicated DB in the container, once the container is stopped, all the data is lost. Setting a name to the volume will persist the data even if the container is stopped. The naming must be as follows:
+`volumes:`
+`- sql-data:/var/opt/mssql` - That is where SQL is expecting to find the data
+
+INSTALLING REDIS
+- Configuring the redis in the docker compose file, stopping it and running it again in order to create the DB.
+- Install the redis Nuget Package - `StackExchange.Redis @Stack Exchange, Inc.,Marc Gravell,Nick Craver` - We installed it in the Infrastructure project
+- Adding the redis as a service in the Program.ts file as a singelton service because we want it to run as long as the application runs
