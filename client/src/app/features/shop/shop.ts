@@ -3,8 +3,8 @@ import { Product } from '../../shared/models/product';
 import { ShopService } from '../../core/shop-service';
 import { ProductItem } from './product-item/product-item';
 import { MatDialog } from '@angular/material/dialog';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
+import { MatButtonModule, MatIconButton } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { FiltersDialog } from './filters-dialog/filters-dialog';
 import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
@@ -17,8 +17,8 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-shop',
   imports: [
     ProductItem,
-    MatButton,
-    MatIcon,
+    MatButtonModule,
+    MatIconModule,
     MatMenu,
     MatSelectionList,
     MatListOption,
