@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Product } from '../../app/shared/models/product';
-import { Pagination } from '../../app/shared/models/pagination';
-import { ShopParams } from '../shared/models/shopParams';
+import { Product } from '../../../app/shared/models/product';
+import { Pagination } from '../../../app/shared/models/pagination';
+import { ShopParams } from '../../shared/models/shopParams';
 
 @Injectable({
   providedIn: 'root',

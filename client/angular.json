@@ -15,7 +15,11 @@
           "skipTests": true
         },
         "@schematics/angular:service": {
-          "path": "/src/app/core",
+          "path": "/src/app/core/services",
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "path": "/src/app/core/interceptors",
           "skipTests": true
         }
       },

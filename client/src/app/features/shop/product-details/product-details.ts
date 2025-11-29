@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ShopService } from '../../../core/shop-service';
+import { ShopService } from '../../../core/services/shop-service';
 import { ActivatedRoute } from '@angular/router';
 import { Product } from '../../../shared/models/product';
 import { CurrencyPipe } from '@angular/common';

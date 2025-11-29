@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Product } from '../../shared/models/product';
-import { ShopService } from '../../core/shop-service';
+import { ShopService } from '../../core/services/shop-service';
 import { ProductItem } from './product-item/product-item';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
