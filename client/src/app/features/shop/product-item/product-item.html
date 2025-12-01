@@ -1,12 +1,13 @@
-@if (product) {
-<mat-card appearance="raised" class="product-card" routerLink="/shop/{{ product.id }}">
-  <img src="{{ product.pictureUrl }}" class="rounded-t-lg" alt="image of {{ product.name }}" />
+@if (product()) {
+<mat-card appearance="raised" class="product-card" routerLink="/shop/{{ product().id }}">
+  <img src="{{ product().pictureUrl }}" class="rounded-t-lg" alt="image of {{ product().name }}" />
   <mat-card-content class="mt-2">
-    <h2 class="text-sm font-semibold uppercase">{{ product.name }}</h2>
-    <p class="font-light">{{ product.price | currency }}</p>
+    <h2 class="text-sm font-semibold uppercase">{{ product().name }}</h2>
+    <p class="font-light">{{ product().price | currency }}</p>
   </mat-card-content>
-  <mat-card-actions>
-    <button mat-stroked-button class="w-full">
+  <!-- The (click)="$event.stopPropagation() will stop the propagation of the event. We want this because we don't want the application to redirect to the Shop component when clicking on the Add to cart button. Only when clicking on the product itself, and we have a routerLink in line 2 that does exactly this so when stopping propagation we do not reach to that -->
+  <mat-card-actions (click)="$event.stopPropagation()">
+    <button mat-stroked-button class="w-full" (click)="cartService.addItemToCart(product())">
       <mat-icon>add_shopping_cart</mat-icon>
       Add to cart
     </button>

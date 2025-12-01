@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, NgZone } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadge } from '@angular/material/badge';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { BusyService } from '../../core/services/busy-service';
 import { MatProgressBar } from '@angular/material/progress-bar';
+import { CartService } from '../../core/services/cart-service';
 
 @Component({
   selector: 'app-header',
@@ -13,5 +14,6 @@ import { MatProgressBar } from '@angular/material/progress-bar';
   styleUrl: './header.scss',
 })
 export class Header {
-  busyService = inject(BusyService);
+  protected busyService = inject(BusyService);
+  protected cartService = inject(CartService);
 }

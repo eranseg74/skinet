@@ -1,4 +1,6 @@
 @use '@angular/material' as mat;
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 // Customize the entire app. Change :root to your selector if you want to scope the styles.
 :root {
@@ -6,6 +8,7 @@
     (
       filled-container-shape: '6px',
       outlined-container-shape: '6px',
+      filled-container-color: #943bf3,
     )
   );
   @include mat.badge-overrides(
