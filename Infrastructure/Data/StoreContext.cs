@@ -1,5 +1,6 @@
 using Core.Entities;
 using Infrastructure.Config;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -7,10 +8,15 @@ namespace Infrastructure.Data;
 // The parentheses syntax is used here to define a primary constructor. It is like writing a constructor
 // that takes DbContextOptions as a parameter and passes it to the base DbContext class.
 // We need to pass to the DbContext (through the options which are passed to the base DbContext) the connection string to the SqlServer and also register this as a service in the application (Program.cs). Everything we register as a service can be injected to other classes using the dependency injection mechanism
-public class StoreContext(DbContextOptions options) : DbContext(options)
+
+// public class StoreContext(DbContextOptions options) : DbContext(options)
+
+// The following implements using the identity framework
+public class StoreContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
   // Entity Framework will take the Products name and create a table with this name in the database
   public DbSet<Product> Products { get; set; }
+  public DbSet<Address> Addresses { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

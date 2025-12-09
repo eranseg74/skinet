@@ -92,3 +92,18 @@ INSTALLING REDIS
 - Configuring the redis in the docker compose file, stopping it and running it again in order to create the DB.
 - Install the redis Nuget Package - `StackExchange.Redis @Stack Exchange, Inc.,Marc Gravell,Nick Craver` - We installed it in the Infrastructure project
 - Adding the redis as a service in the Program.ts file as a singelton service because we want it to run as long as the application runs
+
+ADDING IDENTITY FRAMEWORK
+1) From Nuget install the [Microsoft.Extensions.Identity.Stores] package. This package contains the IdentityUser class from which the AppUser class will be derived. Since the AppUser class will derivefrom the IdentityUser class which is in this package, this Nuget isinstalledin the Core project
+2) From Nuget install the [Microsoft.AspNetCore.Identity.EntityFrameworkCore] package in the Infrastructure project
+3) Create an AppUser class that will be connected to the User table in the Identity Framework. The class will implement the IdentityUser class from the Identity Framework
+4) In the StoreContext change the implements from DbContext to `IdentityDbContext<AppUser>`
+5) In the Program.cs add the following services:
+   1) `builder.Services.AddAuthorization();`
+   2) `builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();`
+6) Also in the Program.cs file add the following after the MapControllers: `app.MapIdentityApi<AppUser>();`
+7) Create a new Migration - Go one level up (In this project's case we need to go up to the skinet folder) and run the following command -> dotnet ef migrations add IdentityAdded -s API -p Infrastructure (the general command is:
+   dotnet ef migrations add <migration name> -s <starter project> -p <where the StoreContext is>
+
+COOKIES
+One of the advantages of cookies on JWT Barear is the HttpOnly flag which blocks the access to cookies using JavaScript. That means that even if we could decode the data in the cookie it does not matter because we cannot access it in the Angular application. It remains in the browser and used in every API call
