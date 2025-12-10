@@ -61,7 +61,7 @@ namespace API.Controllers
         }
 
         // An anonymous call that checks if the user is authenticated. If the user is not logged in then the User.Identity is null and a false value is returned
-        [HttpGet]
+        [HttpGet("auth-status")]
         public ActionResult GetAuthState()
         {
             return Ok(new { IsAuthenticated = User.Identity?.IsAuthenticated ?? false });

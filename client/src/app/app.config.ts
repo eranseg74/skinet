@@ -13,6 +13,7 @@ import { loadingInterceptor } from './core/interceptors/loading-interceptor';
 import { InitService } from './core/services/init-service';
 import { lastValueFrom } from 'rxjs';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { authInterceptor } from './core/interceptors/auth-interceptor';
 
 // This function will run on app initialization (see the app.config.ts file). It will run the init function which gets the cart id from the local storage and returns an observable with the cart. We are using the finally option to indicate that when we get a response from the promise we can display the cart so we will remove the splach class. Since we don't want to subscribe to the observable but just execute it once, we use the lastValueFrom (firstValueFrom is also Ok) because we are getting one value from the service anyway
 
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([errorInterceptor, loadingInterceptor])),
+    provideHttpClient(withInterceptors([errorInterceptor, loadingInterceptor, authInterceptor])),
     // The provided function is injected at application startup and executed during app initialization. If the function returns a Promise or an Observable, initialization does not complete until the Promise is resolved or the Observable is completed.
     provideAppInitializer(async () => {
       const initService = inject(InitService);
