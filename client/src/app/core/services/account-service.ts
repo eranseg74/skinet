@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Address, User } from '../../shared/models/user';
-import { map } from 'rxjs';
+import { map, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +51,16 @@ export class AccountService {
   }
 
   updateAddress(address: Address) {
-    return this.http.post(this.baseUrl + 'account/address', address);
+    return this.http.post(this.baseUrl + 'account/address', address).pipe(
+      // When updating the address in the Addresses table we also want to update the User table that also has an Address property with all the address's parameters. The best way is to use the tap function which aloows us to execute code as a side-effect without interfering with the Observable that is being return
+      tap(() => {
+        // The user here is the signal user. We use the update because in this function we also have an access to the current value of the signal (the user) so we will not overrite the entire user but only the required part - here is the address
+        this.currentUser.update((user) => {
+          if (user) user.address = address;
+          return user; // Returning the updated user in order to update the user in the signal
+        });
+      })
+    );
   }
 
   getAuthState() {

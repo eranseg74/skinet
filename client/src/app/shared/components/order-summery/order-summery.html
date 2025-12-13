@@ -23,10 +23,13 @@
         <dd class="font-medium text-gray-900">{{ cartSrvice.totals()?.total | currency }}</dd>
       </dl>
     </div>
+    <!-- If we are in the checkout screen we don't need the checkout button to take us there -->
+    @if (location.path() !== '/checkout') {
     <div class="flex flex-col gap-2">
       <button class="matb" routerLink="/checkout" mat-flat-button>Checkout</button
       ><button mat-button routerLink="/shop">Continue Shopping</button>
     </div>
+    }
   </div>
   <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
     <form class="space-y-2 flex flex-col p-2">

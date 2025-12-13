@@ -23,6 +23,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 // Using the AddScoped method means that a new instance of the ProductRepository will be created for each HTTP request and will be shared across the different components that are part of that request. This is suitable for repositories that interact with the DbContext, as it ensures that all operations within a single request use the same context instance, maintaining consistency and enabling features like change tracking.
 // When a request comes it will go to the appropriate controller, and if that controller has a constructor parameter of type IProductRepository, the DI container will provide an instance of ProductRepository. The controller can then use this instance to perform data operations related to products. Once the request is completed, the instance will be disposed of.
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 // Other types of service lifetimes include AddSingleton (a single instance is created and shared throughout the application's lifetime) and AddTransient (a new instance is created each time the service is requested and is disposed once the method is completed).
 
 // When registering the Generic repository service, because the type is unknown (type T can be any type) the syntax will be as follows:

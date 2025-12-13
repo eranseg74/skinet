@@ -1,0 +1,24 @@
+<div class="w-full">
+  <!-- The [value] here is the value for the radio-group which should be equal to the value of the selected radio button if there is a corresponding radio button with a matching value. If there is not such a corresponding radio button, this value persists to be applied in case a new radio button is added with a matching value. -->
+  <!-- The value in the $event.value is the value of the selected radio button -->
+  <mat-radio-group
+    [value]="cartService.selectedDelivery()?.id"
+    (change)="updateDeliveryMethod($event.value)"
+    class="grid grid-cols-2 gap-4"
+  >
+    @for (method of checkoutService.deliveryMethods; track method.id) {
+    <label class="p-3 border border-gray-200 cursor-pointer w-full h-full hover:bg-purple-100">
+      <mat-radio-button
+        class="w-full h-full"
+        [checked]="cartService.selectedDelivery() === method"
+        [value]="method"
+      >
+        <div class="flex flex-col w-full h-full">
+          <strong>{{ method.shortName }} - {{ method.price | currency }}</strong>
+          <span class="text-sm">{{ method.description }}</span>
+        </div>
+      </mat-radio-button>
+    </label>
+    }
+  </mat-radio-group>
+</div>

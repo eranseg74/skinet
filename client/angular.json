@@ -25,6 +25,10 @@
         "@schematics/angular:guard": {
           "path": "/src/app/core/guards",
           "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "path": "/src/app/shared/pipes",
+          "skipTests": true
         }
       },
       "root": "",

@@ -18,5 +18,18 @@ public class StoreContextSeed
         await context.SaveChangesAsync();
       }
     }
+
+    // Seeding data for the Delivery Methods
+    if (!context.DeliveryMethods.Any())
+    {
+      // Read the JSON file containing the seed data for delivery methods. Using the path relative to the project structure. We are specifying the path although we are in the same folder because for later when we will deploy the application.
+      var deliveryMethodsData = File.ReadAllText("../Infrastructure/Data/SeedData/delivery.json");
+      var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodsData);
+      if (deliveryMethods != null)
+      {
+        context.DeliveryMethods.AddRange(deliveryMethods);
+        await context.SaveChangesAsync();
+      }
+    }
   }
 }

@@ -13,8 +13,7 @@ public class AddressDto
   [Required]
   public string City { get; set; } = string.Empty;
 
-  [Required]
-  public string State { get; set; } = string.Empty;
+  public string? State { get; set; } = string.Empty;
 
   [Required]
   public string PostalCode { get; set; } = string.Empty;

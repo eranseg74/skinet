@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/select';
 import { MatInput } from '@angular/material/input';
 import { CartService } from '../../../core/services/cart-service';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, Location } from '@angular/common';
 
 @Component({
   selector: 'app-order-summery',
@@ -14,4 +14,6 @@ import { CurrencyPipe } from '@angular/common';
 })
 export class OrderSummery {
   protected cartSrvice = inject(CartService);
+  // The Location service can be used to interact with a browser's URL. To get data. To go to a different URL use the Router
+  location = inject(Location); // Make sure the Location comes from @angular/common!!!
 }

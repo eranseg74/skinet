@@ -1,5 +1,90 @@
-<div class="mt-5">
-  <h1 class="text-2xl">
-    Only authorized users and those with something in the cart should be able to see this!
-  </h1>
+<div class="flex mt-32 gap-6">
+  <div class="w-3/4">
+    <!-- The [linear] attribute allows to set the stepper as a linear process which means that the user will not be able to go to the next step until all the requirements from the current step are complete. For each step here we will need to define the [completed] attribute in order to know if the step is complete -->
+    <!-- The #stepper is a template reference variable that we can reference in the ts file and also here in the template like we are doing in the payment button below. Note that the reference is on thre MatStepper element which is what the confirmPayment function expects as an argument -->
+    <mat-stepper
+      (selectionChange)="onStepChange($event)"
+      [linear]="true"
+      #stepper
+      class="bg-white border border-gray-200 shadow-sm"
+    >
+      <mat-step label="Address" [completed]="addressComplete()">
+        <div id="address-element"></div>
+        <div class="flex justify-end mt-1">
+          <mat-checkbox [checked]="saveAddress" (change)="onSaveAddressCheckboxChange($event)">
+            Save as default address
+          </mat-checkbox>
+        </div>
+        <div class="flex justify-between mt-6">
+          <button class="z-0" routerLink="/shop" mat-stroked-button>Continue shopping</button>
+          <!-- matStepperNext will move the user to the next step in the stepper element -->
+          <button
+            [disabled]="!addressComplete()"
+            class="btn-white-text z-0"
+            matStepperNext
+            mat-flat-button
+          >
+            Next
+          </button>
+        </div>
+      </mat-step>
+      <mat-step label="Shipping" [completed]="deliveryComplete()">
+        <app-checkout-delivery
+          (deliveryComplete)="handleDeliverChange($event)"
+        ></app-checkout-delivery>
+        <div class="flex justify-between mt-6">
+          <button matStepperPrevious mat-stroked-button>Back</button>
+          <!-- matStepperNext will move the user to the next step in the stepper element -->
+          <button
+            [disabled]="!deliveryComplete()"
+            class="btn-white-text"
+            matStepperNext
+            mat-flat-button
+          >
+            Next
+          </button>
+        </div>
+      </mat-step>
+      <mat-step label="Payment" [completed]="paymentComplete()">
+        <div id="payment-element"></div>
+        <div class="flex justify-between mt-6">
+          <button matStepperPrevious mat-stroked-button>Back</button>
+          <!-- matStepperNext will move the user to the next step in the stepper element -->
+          <button
+            [disabled]="!paymentComplete()"
+            class="btn-white-text"
+            matStepperNext
+            mat-flat-button
+          >
+            Next
+          </button>
+        </div>
+      </mat-step>
+      <mat-step label="Confirmation">
+        <app-checkout-review [confirmationToken]="confirmationToken()"></app-checkout-review>
+        <div class="flex justify-between mt-6">
+          <button matStepperPrevious mat-stroked-button>Back</button>
+          <!-- matStepperNext will move the user to the next step in the stepper element -->
+          <button
+            [disabled]="!confirmationToken() || loading()"
+            (click)="confirmPayment(stepper)"
+            class="btn-white-text"
+            mat-flat-button
+          >
+            @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+            <span>Pay {{ cartService.totals()?.total | currency }}</span>
+            }
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+    <pre>{{ addressComplete() | json }}</pre>
+    <pre>{{ deliveryComplete() | json }}</pre>
+    <pre>{{ paymentComplete() | json }}</pre>
+  </div>
+  <div class="w-1/4">
+    <app-order-summery></app-order-summery>
+  </div>
 </div>
