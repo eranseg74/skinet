@@ -28,6 +28,10 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
 
   public bool IsPagingEnabled { get; private set; }
 
+  public List<Expression<Func<T, object>>> Includes { get; } = [];
+
+  public List<string> IncludeStrings { get; } = [];
+
   public IQueryable<T> ApplyCriteria(IQueryable<T> query)
   {
     if (Criteria != null)
@@ -35,6 +39,17 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
       query = query.Where(Criteria);
     }
     return query;
+  }
+
+  // Setters for the Include methods
+  protected void AddInclude(Expression<Func<T, object>> includeExpression)
+  {
+    Includes.Add(includeExpression);
+  }
+
+  protected void AddInclude(string includeString)
+  {
+    IncludeStrings.Add(includeString); // For ThenInclude
   }
 
   // The expression will be evaluated in the specification evaluator in the generic repository to filter the data accordingly. The evaluator will be in the Infrastructure layer.

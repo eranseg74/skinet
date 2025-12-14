@@ -1,11 +1,12 @@
 using Core.Entities;
 using Core.Interfaces;
+using Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Stripe;
 
 namespace Infrastructure.Services;
 
-public class PaymentService(IConfiguration configuration, ICartService cartService, IGenericRepository<Core.Entities.Product> productRepo, IGenericRepository<DeliveryMethod> dmRepo) : IPaymentService
+public class PaymentService(IConfiguration configuration, ICartService cartService, IUnitOfWork unitOfWork) : IPaymentService
 {
   public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
   {
@@ -21,13 +22,13 @@ public class PaymentService(IConfiguration configuration, ICartService cartServi
     if (cart.DeliveryMethodId.HasValue) // We have access to the HasValue method because we declared the DeliveryMethodId as optional
     {
       // Getting the delivery method in order to extract from it the shipping price
-      var deliverMethod = await dmRepo.GetByIdAsync((int)cart.DeliveryMethodId);
+      var deliverMethod = await unitOfWork.Repository<DeliveryMethod>().GetByIdAsync((int)cart.DeliveryMethodId);
       if (deliverMethod == null) return null;
       shippingPrice = deliverMethod.Price;
     }
     foreach (var item in cart.Items)
     {
-      var productItem = await productRepo.GetByIdAsync(item.ProductId);
+      var productItem = await unitOfWork.Repository<Core.Entities.Product>().GetByIdAsync(item.ProductId);
       if (productItem == null) return null;
       if (item.Price != productItem.Price)
       {

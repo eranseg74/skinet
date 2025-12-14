@@ -11,7 +11,7 @@ namespace API.Controllers;
 // The IGenericRepository<Product> is injected into the controller through its constructor. This allows the controller to access the repository methods for performing CRUD operations on the Product entity.
 // Because the repository is registered as a service in the dependency injection container, ASP.NET Core will automatically provide an instance of the repository when creating the ProductsController.
 // Because the IGenericRepository is a generic interface, it can be reused for different entities, promoting code reusability and separation of concerns. We set it up specifically for the Product entity in this controller.
-public class ProductsController(IGenericRepository<Product> repo) : BaseApiController
+public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
 {
   // When a request is made to "api/products", this method will be invoked. The request comes as a thread and the method is asynchronous to avoid blocking the thread while waiting for the database operation to complete. 
   [HttpGet] // This attribute indicates that this action method responds to HTTP GET requests.
@@ -24,13 +24,13 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
     // Using the generic repository instead of the specific product repository. This will give us an unsorted and unfiltered list of products because the parameters are not used in the generic implementation.
     var spec = new ProductSpecification(specParams);
 
-    return await CreatePagedResult(repo, spec, specParams.PageIndex, specParams.PageSize);
+    return await CreatePagedResult(unitOfWork.Repository<Product>(), spec, specParams.PageIndex, specParams.PageSize);
   }
 
   [HttpGet("{id:int}")] // This attribute indicates that this action method responds to HTTP GET requests with an integer parameter in the URL. // api/products/3
   public async Task<ActionResult<Product>> GetProduct(int id)
   {
-    var product = await repo.GetByIdAsync(id);
+    var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
     if (product == null)
     {
       return NotFound();
@@ -41,8 +41,8 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
   [HttpPost]
   public async Task<ActionResult<Product>> CreateProduct(Product product)
   {
-    repo.Add(product);
-    if (await repo.SaveAllAsync())
+    unitOfWork.Repository<Product>().Add(product);
+    if (await unitOfWork.Complete())
     {
       // The CreatedAtAction method creates a response with a 201 status code (Created) and includes a Location header with the URI of the newly created resource. It also returns the created product in the response body.
       // The "GetProduct" parameter specifies the action method to use for generating the URI of the newly created product. The new { id = product.Id } parameter provides the route values needed to generate the URI (in this case, the ID of the newly created product that is needed in order to execute the GetProduct -> [HttpGet("{id:int}")]). The product parameter is the content to be returned in the response body.
@@ -60,10 +60,10 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
       return BadRequest("Can't update product - Id mismatch");
     }
     // Since the product is not being tracked by the context (it was not retrieved from the database in this request), we need to inform the context that this entity has been modified. This tells the entity tracker that what we are passing here is an updated version of an existing entity and that it has been modified.
-    repo.Update(product);
+    unitOfWork.Repository<Product>().Update(product);
 
     // Save the changes to the database asynchronously. After we defined the entity as modified, we need to call SaveChangesAsync to persist the changes to the database.
-    if (await repo.SaveAllAsync())
+    if (await unitOfWork.Complete())
     {
       return NoContent();
     }
@@ -74,13 +74,13 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
   [HttpDelete("{id:int}")]
   public async Task<ActionResult> DeleteProduct(int id)
   {
-    var product = await repo.GetByIdAsync(id);
+    var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
     if (product == null)
     {
       return NotFound();
     }
-    repo.Remove(product);
-    if (await repo.SaveAllAsync())
+    unitOfWork.Repository<Product>().Remove(product);
+    if (await unitOfWork.Complete())
     {
       return NoContent();
     }
@@ -92,7 +92,7 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
   {
     // return Ok(await productRepository.GetBrandsAsync());
     var spec = new BrandListSpecification();
-    return Ok(await repo.ListAsync(spec));
+    return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
   }
 
   [HttpGet("types")]
@@ -100,11 +100,11 @@ public class ProductsController(IGenericRepository<Product> repo) : BaseApiContr
   {
     // return Ok(await productRepository.GetTypesAsync());
     var spec = new TypeListSpecification();
-    return Ok(await repo.ListAsync(spec));
+    return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
   }
 
   private bool ProductExists(int id)
   {
-    return repo.Exists(id);
+    return unitOfWork.Repository<Product>().Exists(id);
   }
 }

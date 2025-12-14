@@ -12,6 +12,10 @@ public interface ISpecification<T>
   Expression<Func<T, object>>? OrderBy { get; } // Sorting criteria for ascending order. This expression defines how the entities should be ordered when retrieved from the data source. It takes an entity of type T and returns an object that represents the property to sort by in ascending order.
   Expression<Func<T, object>>? OrderByDescending { get; } // Sorting criteria for descending order. Similar to OrderBy, but specifies that the sorting should be done in descending order.
 
+  List<Expression<Func<T, object>>> Includes { get; } // This will allow to execute the Include method in a query in order to get related entities. This option will allow us to get related entities that are only on the top level, which mean - inside the T object and not nested inside an object that is inside the T object. To get nested properties we need the ThenInclude method.
+
+  List<string> IncludeStrings { get; } // For ThenInclude. This method will be used to extract nested properties inside objects that are inside the main object.
+
   bool IsDistinct { get; } // Indicates whether the query should return distinct results. If set to true, the query will eliminate duplicate entries from the result set.
 
   int Take { get; } // Number of records to take for pagination. This property specifies how many records should be retrieved from the data source when pagination is applied.

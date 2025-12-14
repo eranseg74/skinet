@@ -28,6 +28,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // When registering the Generic repository service, because the type is unknown (type T can be any type) the syntax will be as follows:
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Adding CORS to the application. CORS is a security feature in browsers. Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own. CORS works by adding Access-Control-Allow-* headers to your server's responses. These headers inform the browser which origins (domains), methods (GET, POST, PUT, DELETE), and headers are permitted for cross-origin requests.
 // After defining it here as a service we need to define its middleware. It must be between the exception and the controll mapping middlewares otherwise it might not work!

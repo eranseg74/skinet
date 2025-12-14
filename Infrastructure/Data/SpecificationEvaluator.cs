@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
@@ -38,6 +39,11 @@ public class SpecificationEvaluator<T> where T : BaseEntity
     {
       query = query.Skip(spec.Skip).Take(spec.Take);
     }
+
+    // We implement the Include methods to get related entities. We define it only here in the evaluator because it's related to querying the database. Also only in this method because if we are using includes, we do not use it for projection.
+    // Here we use the Aggregate function to allow several includes. Each time the function will take the query. The query will be the current and the include will be the expression we want to add. The updated query will be passed again to enter the next include to the updated query until we get a query which aggregates all the required queries.
+    query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+    query = spec.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
 
     return query;
   }

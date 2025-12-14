@@ -13,7 +13,7 @@ public interface IGenericRepository<T> where T : BaseEntity
   void Add(T entity);
   void Update(T entity);
   void Remove(T entity);
-  Task<bool> SaveAllAsync();
+  // Task<bool> SaveAllAsync(); // Implemented in the UnitOfWork
   bool Exists(int id);
   Task<int> CountAsync(ISpecification<T> spec); // new method to count entities based on a specification. We need this for pagination so we know how many pages there are.
 }
