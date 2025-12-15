@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -47,6 +48,8 @@ builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();
 
+builder.Services.AddSignalR();
+
 // This line is the seperator between service configuration and app configuration. Everything above this line is configuring services, everything below is configuring the app and this is where we will configure the middlewares.
 // Services are anythimg we will inject into other parts of the application via Dependency Injection (DI). Middlewares are components that form the request pipeline and handle requests and responses.
 
@@ -59,10 +62,16 @@ app.UseMiddleware<ExceptionMiddleware>();
 // Adding the CORS middleware to the pipeline. Adding the AllowCredentials() method will allow the cookies to be passed along with the request. This is necessary for authentication because the cookie contains the authentication token. This will allow sending cookies from the client (Angular) to the server (API) which are on different domains.
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:4200", "https://localhost:4200")); // In the method we need to define what are we allowing. In the WithOrigins we are specifying from where we are allowing the requests to come from. Without these URLs the request will still go to the server but it is the browser that will not display the content (browser security feature)
 
+// Specifying middleware for SignalR authentication because SignalR does not use the API endpoints. Must be in this order. Also, because we are using cookies this will work without any special configuration
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 // Adding configuration for the Identity Framework
 app.MapGroup("api").MapIdentityApi<AppUser>(); // The MapGroup allows to add text to the url. Without it the url will be composed of the baseUrl and the login/reister words that come from the IdentityFramework (would be - https://localhost:5001/login). defining "api" in the MapGroup will add the "api" word -> https://localhost:5001/api/login (because outr login and register implementation is in the AccountController the url will be -> https://localhost:5001/api/account/login)
+
+app.MapHub<NotificationHub>("/hub/notifications"); // Maps incoming requests with the specified path to the specified Microsoft.AspNetCore.SignalR.Hub type.
 
 // Seeding data if needed (adding initial data to the database in case it is empty)
 try

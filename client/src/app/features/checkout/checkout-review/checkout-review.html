@@ -6,7 +6,7 @@
     <dd class="mt-1 text-gray-500">{{ confirmationToken()?.shipping | address }}</dd>
     <dt class="font-medium">Payment details</dt>
     <dd class="mt-1 text-gray-500">
-      {{ confirmationToken()?.payment_method_preview?.card | payment }}
+      {{ confirmationToken()?.payment_method_preview! | payment }}
     </dd>
   </dl>
 </div>
@@ -17,9 +17,11 @@
       <tbody class="divide-y divide-gray-200">
         @for (item of cartService.cart()?.items; track item.productId) {
         <tr>
-          <td class="flex items-center gap-4">
-            <img src="{{ item.pictureUrl }}" alt="product image" class="w-10 h-10" />
-            <span>{{ item.productName }}</span>
+          <td class="py-4">
+            <div class="flex items-center gap-4">
+              <img src="{{ item.pictureUrl }}" alt="product image" class="w-10 h-10" />
+              <span>{{ item.productName }}</span>
+            </div>
           </td>
           <td class="p-4">x{{ item.quantity }}</td>
           <td class="p-4 text-right">{{ item.price | currency }}</td>

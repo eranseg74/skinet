@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Address, User } from '../../shared/models/user';
 import { map, tap } from 'rxjs';
+import { SignalrService } from './signalr-service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { map, tap } from 'rxjs';
 export class AccountService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
+  private signalrService = inject(SignalrService);
   currentUser = signal<User | null>(null);
 
   login(values: any) {
@@ -18,7 +20,9 @@ export class AccountService {
     // We are not defining the URL as account/login because we are using the login method provided by the IdentityFramework. This is alsowhy it is not implemented in the AccountController in the API and this is why we should write 'login' and not 'account/login'.
     // We need to use the withCredentials because this is an authenticated EndPoint. It is not required here because it is executed using the AuthInterceptor. Note that the AuthInterceptor will send all the requests with a cookie, even those that does not need it.
     // return this.http.post<User>(this.baseUrl + 'login', values, { params, withCredentials: true });
-    return this.http.post<User>(this.baseUrl + 'login', values, { params });
+    return this.http
+      .post<User>(this.baseUrl + 'login', values, { params })
+      .pipe(tap(() => this.signalrService.createHubConnection()));
   }
 
   register(values: any) {
@@ -47,7 +51,9 @@ export class AccountService {
   logout() {
     // We need to use the withCredentials because this is an authenticated EndPoint. It is not required here because it is executed using the AuthInterceptor
     // return this.http.post(this.baseUrl + 'account/logout', {}, { withCredentials: true });
-    return this.http.post(this.baseUrl + 'account/logout', {});
+    return this.http
+      .post(this.baseUrl + 'account/logout', {})
+      .pipe(tap(() => this.signalrService.stopHubConnection()));
   }
 
   updateAddress(address: Address) {

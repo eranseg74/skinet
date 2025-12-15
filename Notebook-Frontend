@@ -50,3 +50,6 @@ If implementing interceptors they should be added to the provideHttpClient funct
 ENVIRONMENTS
 In order to be able to define environment variables we need to create the environments folder
 using a dedicated call -> `ng g environments`. This will create the folder and 2 TS files -> one for the production and one for the development. It will also automatically update the [angular.json] file under the development object and set a replacement file instruction saying to use a [envirnment.development.ts] file if working in <development> mode.
+
+SignalR
+1) The main idea is when the app is initialized and the user is logged in we will make the connection to the SignalR service on the backend, and we will also create this connection on every user login

@@ -123,3 +123,21 @@ STRIPE
 3) Download required Nuget package: [Stripe.net] in the Infrastructure project
 4) Create an Interface for payment intent (IPaymentService) and an implementation service (PaymentService).
 5) In the Program.cs class, add the service and interface
+
+Checking Stripe in local environment:
+1) Install the Stripe CLI (best using homebrew) with the following command: `brew install stripe/stripe-cli/stripe`
+2) Login into the stripe CLI with the following command: `stripe login`. This will prompt a message that will ask you to press enter in order to open the browser. Clicking Enter will open a new tab in the browser and send to the email a 6-digit code. Fill the code you got in the browser. You will get a message in the browser that the login succeeded and also in the command line you will get a message with an account id (the key) and a message that says that this key is valid for 90 days. After 90 days a new authentication is required.
+3) After the login, in the command line you get the WhSecret key. Copy it to the appsettings file as the value of the WhSecret key
+4) Run the tests against Stripe
+
+SignalR
+On the backend side:
+1) Create a new folder called SignalR and inside it - creating a class (we called NotificationHub). This class must derive from the Hub class which is in the SignalR namespace. Don't need to install anything because dotnet comes with SignalR
+2) Note that SignalR keeps track of the client connection id and that is what the browser usees to maintain a connection with SignalR. This means that if we want to keep track on which user is connected we need to store it in a dictionary that will contain for each email its connection id. In case of multiple servers and clients it is best to keep it in a DB such as Redis for scalability reasons
+3) In the Program.cs class 
+   1) We need to add the SignalR service - `builder.Services.AddSignalR();`
+   2) Make sure to specify the authentication and authorization middleware: `app.UseAuthentication();` and `app.UseAuthorization();`
+   3) Provide the mapping so dotnet will know where to forward any requests that come in to our SignalR hub using the following command: `app.MapHub<NotificationHub>("/hub/notifications");` This will map all the incoming requests with the specified path to the specified Microsoft.AspNetCore.SignalR.Hub type.
+   4) Inject the NotificationHub (or any class that implements the SignalR). This will give access to the SignalR hub so we can send notifications outside of the hub using this approach.
+   5) In the method that will use it we first need to extract the connection id from the DB that maintain the connection between the emails and the connection ids by passing the email of the user.
+   6) Then, we can send a message through the SignalR getting the connection using the connectionId and then using the `SendAsync` method to send a message with a message name (string) and the object with all the required data that the client can use.
