@@ -105,4 +105,4 @@ The Publish will be deployed. At the end of the deployment VSCode will offer to 
    8) In case of an error you can see which step failed.
    9) After ending the action a new .yml file will be added to the repository under the .github/workflows folder which is also added to the repository.
    10) In case of error in the publish step it might be the path to the startup project. In that case we need to make changes in the yml file. To do it in VSCode we need first to pull the repository because we need the .yml file and we don't have it in VSCode (up until now we only pushed files but never pulled them from GitHub)
-   11) Go to the source control tab in VSCode and 
+   11) Go to the source control tab in VSCode and click on the ... icon. In the menu select the Pull option. This will update all the files in VSCode in accordance with the files in GitHub.
