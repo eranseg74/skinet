@@ -98,3 +98,11 @@ The Publish will be deployed. At the end of the deployment VSCode will offer to 
    1) Go to Stripe, to the production account you created and copy the Publishable key.
    2) Paste the copied key in the value of the stripePublishableKey in the environment.ts file in the client folder so it will match what we are using in the API in production.
    3) After this update - go to VSCode to the client folder and build it again to update the wwwroot folder in the API with the updated key
+   4) After running the ng build, go to the source control in VSCode and commit all thr changes.
+   5) In Azure, close the Preview file and click on the Save button to save the deployment configuration. This will create the workflow in GitHub
+   6) In GitHub, in the relevant repository, under the Actions tab the Add or update the Azure App Service build and deployment workflow... will be displayed with its status (running, completed, failed).
+   7) Clicking on the action will show the build and deploy steps.
+   8) In case of an error you can see which step failed.
+   9) After ending the action a new .yml file will be added to the repository under the .github/workflows folder which is also added to the repository.
+   10) In case of error in the publish step it might be the path to the startup project. In that case we need to make changes in the yml file. To do it in VSCode we need first to pull the repository because we need the .yml file and we don't have it in VSCode (up until now we only pushed files but never pulled them from GitHub)
+   11) Go to the source control tab in VSCode and 
