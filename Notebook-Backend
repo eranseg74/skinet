@@ -141,3 +141,16 @@ On the backend side:
    4) Inject the NotificationHub (or any class that implements the SignalR). This will give access to the SignalR hub so we can send notifications outside of the hub using this approach.
    5) In the method that will use it we first need to extract the connection id from the DB that maintain the connection between the emails and the connection ids by passing the email of the user.
    6) Then, we can send a message through the SignalR getting the connection using the connectionId and then using the `SendAsync` method to send a message with a message name (string) and the object with all the required data that the client can use.
+
+Preparing the backend for deployment
+1) In the Program.cs file:
+   1) Define a middleware to serve the static assets from the API using this command: `app.UseDefaultFiles();` which will by default look for the files in the <wwwroot> subfolder. In order to serve the static files we need the following middleware: `app.UseStaticFiles();`.
+2) Since the angular files are hosted in the dotnet webserver there are the dotnet API endpoints and there are also Angular routes that are responsible for loading components. When all is in the dotnet webserver, whenever an Angular call is made, dotnet will see it as an API call but since it does not have this call it will return a NotFound result. The following command is needed: `app.MapFallbackToController("Index", "Fallback");`. It will make sure that if dotnet will not succeed in processing the API call it will pass it to Angular to let it handle the call. You will need to implement the FallbackController class which will handle these calls. The Index parameter is the action that will be implemented in the FallbackController class (must be the same name).
+3) The <FallbackController>:
+   1) Make sure to call it that way.It should match the second parameter in the middleware and end with the <Conroller> text so we won't need to specify it in the middleware. The FallbackController needs to inherit from the Controller class since this class returns a view which is what we need.
+4) If we have a seed data, in the StoreContextSeed file we need to define the path as defined in the StoreContextSeed.cs class. Also in the relevant project (in this case it is the Infrastructure project) by defining the following:
+   `<None Include="Data\SeedData\**" CopyToOutputDirectory="PreseveNewest" />`
+5) Then Go to the root folder (skinet in this case) and reset the DB: `dotnet ef database drop -p Infrastructure -s API`
+6) Then go back to the API folder and run the `dotnet build` command. This will create the <bin> and <obj> folders. Inside the <bin>, in the <Debug/net10.0/Data/SeedData> the json files with the seed data will appear
+7) Redis - On local environment we use docker to run the Redis DB. When deploying it will not work so we need a cloude solution that hosts Redis DB. We can use the Upstash serverless data platform
+8) In the appsettings.development file - update the value of the Redis key to the proprties from the Upstash site

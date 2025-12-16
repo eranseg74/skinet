@@ -20,7 +20,7 @@ import { AccountService } from '../../core/services/account-service';
 import { CheckoutDelivery } from './checkout-delivery/checkout-delivery';
 import { CheckoutReview } from './checkout-review/checkout-review';
 import { CartService } from '../../core/services/cart-service';
-import { CurrencyPipe, JsonPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/order-service';
@@ -36,7 +36,6 @@ import { OrderService } from '../../core/services/order-service';
     CheckoutDelivery,
     CheckoutReview,
     CurrencyPipe,
-    JsonPipe,
     MatProgressSpinnerModule,
   ],
   templateUrl: './checkout.html',
@@ -128,7 +127,6 @@ export class Checkout implements OnInit, OnDestroy {
           throw new Error(result.error.message);
         }
         this.confirmationToken.set(result.confirmationToken);
-        console.log(this.confirmationToken());
       }
     } catch (error: any) {
       this.snackbar.error(error.message);

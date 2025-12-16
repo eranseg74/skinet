@@ -51,5 +51,17 @@ ENVIRONMENTS
 In order to be able to define environment variables we need to create the environments folder
 using a dedicated call -> `ng g environments`. This will create the folder and 2 TS files -> one for the production and one for the development. It will also automatically update the [angular.json] file under the development object and set a replacement file instruction saying to use a [envirnment.development.ts] file if working in <development> mode.
 
-SignalR
+[SignalR]
 1) The main idea is when the app is initialized and the user is logged in we will make the connection to the SignalR service on the backend, and we will also create this connection on every user login
+
+[`Preparing the Client for deployment`]
+The approach is to host all the client assets (all the javascript, css, and html files) that are created using the build command. The WebServer will be responsible to serve these static assets (including images, icons, etc.) when needed. These files will be in a wwwroot folder in the API folder.
+1) Replace all the hardcoded properties such as localhost, in properties from the environment file.
+2) In the Angular.json file update under the [options] object that is under the [build] object, the [OutputPath] to `../API/wwwroot`. The OutputPath should look like this:
+   `"options": {`
+      `"base": "../API/wwwroot",`
+      `"browser": ""`
+   `}`
+   This will put all the static files created from the ng build command under this folder
+3) If there are delays in the code that were defined for development needs, either remove it, or set it to be relevant only in development by checking the <environment.production> expression which returns `true` if we are in production, and `false` if we are in development mode. If you need to create an empty function (a function that does nothing) you can use the <identity> which is a function that does nothing (like delay(0)).
+4) When running ng build, if you get an error that the file limit was crossed you can change the file limit in the Angular.json file under the [configurations] -> [production] -> [budgets] and change the [maximumError] to a higher value.The ideal is to keep it low for performance.

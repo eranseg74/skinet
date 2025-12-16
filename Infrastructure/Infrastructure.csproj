@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <None Include="Data\SeedData\**" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
@@ -11,9 +12,10 @@
     <PackageReference Include="Stripe.net" Version="50.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- This will not work in production -->
+  <!-- <ItemGroup>
     <Folder Include="Data/SeedData/" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

@@ -66,6 +66,9 @@ app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrig
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 
 // Adding configuration for the Identity Framework
@@ -73,6 +76,7 @@ app.MapGroup("api").MapIdentityApi<AppUser>(); // The MapGroup allows to add tex
 
 app.MapHub<NotificationHub>("/hub/notifications"); // Maps incoming requests with the specified path to the specified Microsoft.AspNetCore.SignalR.Hub type.
 
+app.MapFallbackToController("Index", "Fallback");
 // Seeding data if needed (adding initial data to the database in case it is empty)
 try
 {

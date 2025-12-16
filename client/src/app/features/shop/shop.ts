@@ -60,7 +60,6 @@ export class Shop implements OnInit {
     this.shopService.getProducts(this.shopParams).subscribe({
       next: (response) => {
         this.products.set(response);
-        console.log(response);
       },
       error: (error) => console.log(error),
       complete: () => console.log('complete'),
