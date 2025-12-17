@@ -110,3 +110,22 @@ The Publish will be deployed. At the end of the deployment VSCode will offer to 
 
 // REDIS KEY - Goes to the appsettings.development file when in production:
 `"Redis": "guiding-monarch-23314.upstash.io:6379,password=AVsSAAIncDE5NTZhY2RkMzRkNGI0MTFkYjlmMzhhYTI0MDJhMTgwN3AxMjMzMTQ,ssl=true,abortConnection=False"`
+
+# Adding the client installation and build to the actions for deployment
+Up until now the process that was created by Azure and implemented in GitHub handled only the backend (DotNet).
+To define also the client add the following to the .yml file in the steps section after the - uses: actions/checkout@v4 line:
+``
+- name: Set up node.js
+   uses: actions/setup-node@v3
+   with:
+      node-version: "24"
+
+- name: Install Angular CLI
+   run: npm install -g @angular/cli@21
+
+- name: Install deps and build angular app
+   run: |
+      cd client
+      npm install
+      ng build
+``
