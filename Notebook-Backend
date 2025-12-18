@@ -154,3 +154,8 @@ Preparing the backend for deployment
 6) Then go back to the API folder and run the `dotnet build` command. This will create the <bin> and <obj> folders. Inside the <bin>, in the <Debug/net10.0/Data/SeedData> the json files with the seed data will appear
 7) Redis - On local environment we use docker to run the Redis DB. When deploying it will not work so we need a cloude solution that hosts Redis DB. We can use the Upstash serverless data platform
 8) In the appsettings.development file - update the value of the Redis key to the proprties from the Upstash site
+
+# Adding roles to the application
+1) In the Program.cs class where adding the identity end points, add the Identity roles. The code should look like this: `builder.Services.AddIdentityApiEndpoints<AppUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreContext>();`
+2) Also, in the middlewares section, after creating the context, create the userManager: `var userManager = services.GetRequiredService<UserManager<AppUser>>();`. Then pass to the [StoreContextSeed] the [userManager] along with the [context].
+3) In the [StoreContextSeed] check if an admin exists, and if not then create an admin. In this project we will seed the other roles through a [RoleConfiguration] file which is also a legitimit approach (We could define them also in the [StoreContextSeed] file, the same way we created the admin).

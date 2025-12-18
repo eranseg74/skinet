@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using API.DTOs;
 using API.Extensions;
 using Core.Entities;
@@ -57,6 +58,7 @@ namespace API.Controllers
                 user.LastName,
                 user.Email,
                 Address = user.Address?.ToDto(), // Because it is defined inside an anonymous object and it could be null we need to define it like this and not like the FirstName, LastName, or Email which are strrings
+                Roles = User.FindFirstValue(ClaimTypes.Role) // The roles of the user will be in the cookie. Since the client does not have access to the cookie, we add this data to the user-info for the client to use. The Roles will contain any roles that the user belongs to along with all the rest of the information. This has nothing to do with security which is handled in the backend!
             });
         }
 

@@ -46,4 +46,21 @@ public class BuggyController : BaseApiController
     var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // The ClaimTypes.NameIdentifier refers to the Id property defined in the IdentityUser class (from which the AppUser is derived)
     return Ok("Hello " + name + " with the id of " + id);
   }
+
+  [Authorize(Roles = "Admin")] // This means that the only user that will be able to exeute this call is the admin
+  [HttpGet("admin-secret")]
+  public IActionResult GetAdminSecret()
+  {
+    var name = User.FindFirst(ClaimTypes.Name)?.Value; // The ClaimTypes.Name refers to the UserName property defined in the IdentityUser class (from which the AppUser is derived)
+    var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // The ClaimTypes.NameIdentifier refers to the Id property defined in the IdentityUser class (from which the AppUser is derived)
+    var isAdmin = User.IsInRole("Admin");
+    var roles = User.FindFirstValue(ClaimTypes.Role);
+    return Ok(new
+    {
+      name,
+      id,
+      isAdmin,
+      roles
+    });
+  }
 }

@@ -1,13 +1,24 @@
 using System.Reflection;
 using System.Text.Json;
 using Core.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Data;
 
 public class StoreContextSeed
 {
-  public static async Task SeedAsync(StoreContext context)
+  public static async Task SeedAsync(StoreContext context, UserManager<AppUser> userManager)
   {
+    if (!userManager.Users.Any(x => x.UserName == "admin@test.com"))
+    {
+      var user = new AppUser
+      {
+        UserName = "admin@test.com",
+        Email = "admin@test.com",
+      };
+      await userManager.CreateAsync(user, "Pa$$w0rd");
+      await userManager.AddToRoleAsync(user, "Admin");
+    }
     // The location returns the full path of the loaded file that contains the manifest. Then,in the productsData initialization, instead of passing a relative address we can write as defined here. This type of path will work both in development and production
     var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     if (!context.Products.Any())

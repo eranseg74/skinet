@@ -4,6 +4,7 @@ using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -46,7 +47,7 @@ builder.Services.AddSingleton<ICartService, CartService>();
 
 // Adding services for Identity Framework
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();
+builder.Services.AddIdentityApiEndpoints<AppUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreContext>();
 
 builder.Services.AddSignalR();
 
@@ -84,8 +85,9 @@ try
   using var scope = app.Services.CreateScope();
   var services = scope.ServiceProvider;
   var context = services.GetRequiredService<StoreContext>();
+  var userManager = services.GetRequiredService<UserManager<AppUser>>();
   await context.Database.MigrateAsync(); // Applying any pending migrations to the database. This ensures that the database schema is up to date with the current model defined in the application before seeding data.
-  await StoreContextSeed.SeedAsync(context); // Calling the SeedAsync method from the StoreContextSeed class to seed the database with initial data if needed.
+  await StoreContextSeed.SeedAsync(context, userManager); // Calling the SeedAsync method from the StoreContextSeed class to seed the database with initial data if needed.
 }
 catch (Exception ex)
 {
