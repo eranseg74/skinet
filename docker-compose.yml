@@ -4,7 +4,7 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "Password@1"
-    platform: "linux/amd64"
+    platform: "linux/amd64" # needed only if running on an ARM chips (which I do)
     ports:
       - "1433:1433"
     volumes:

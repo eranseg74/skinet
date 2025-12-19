@@ -59,7 +59,7 @@
             "styles": [
               "src/styles.scss",
               "src/tailwind.css",
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ]
           },

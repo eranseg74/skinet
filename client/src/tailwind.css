@@ -8,6 +8,7 @@
   @apply text-blue-700;
 }
 
+/* Return the cursor behavior from default to cursor in angular materials */
 @layer base {
   button:not(:disabled),
   [role='button']:not(:disabled) {
