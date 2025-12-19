@@ -6,15 +6,11 @@ import { TestError } from './features/test-error/test-error';
 import { ServerError } from './shared/components/server-error/server-error';
 import { NotFound } from './shared/components/not-found/not-found';
 import { Cart } from './features/cart/cart';
-import { Checkout } from './features/checkout/checkout';
 import { Login } from './features/account/login/login';
 import { Register } from './features/account/register/register';
 import { authGuard } from './core/guards/auth-guard';
-import { emptyCartGuard } from './core/guards/empty-cart-guard';
-import { CheckoutSuccess } from './features/checkout/checkout-success/checkout-success';
 import { OrderComponent } from './features/orders/order';
 import { OrderDetailed } from './features/orders/order-detailed/order-detailed';
-import { orderCompleteGuard } from './core/guards/order-complete-guard';
 import { Admin } from './features/admin/admin';
 import { adminGuard } from './core/guards/admin-guard';
 
@@ -23,20 +19,28 @@ export const routes: Routes = [
   { path: 'shop', component: Shop },
   { path: 'shop/:id', component: ProductDetails },
   { path: 'cart', component: Cart },
-  { path: 'checkout', component: Checkout, canActivate: [authGuard, emptyCartGuard] },
-  // When the user is redirected to the success page after a successful checkout we want to make sure that only authenticated users can access this page so we are adding the authGuard here as well.
   {
-    path: 'checkout/success',
-    component: CheckoutSuccess,
-    canActivate: [authGuard, orderCompleteGuard],
+    // This code is the implementation of the Lazy loading. The checkout components will not load until the checkout is visited
+    path: 'checkout',
+    loadChildren: () =>
+      import('./features/checkout/routes').then((routes) => routes.checkoutRoutes),
   },
-  { path: 'orders', component: OrderComponent, canActivate: [authGuard] }, // Keeping the guard because the user needs to be authenticated to get access to this url
-  { path: 'orders/:id', component: OrderDetailed, canActivate: [authGuard] }, // Keeping the guard because the user needs to be authenticated to get access to this url
-  { path: 'account/login', component: Login },
-  { path: 'account/register', component: Register },
+  {
+    path: 'orders',
+    loadChildren: () => import('./features/orders/routes').then((routes) => routes.orderRoutes),
+  },
+  {
+    path: 'account',
+    loadChildren: () => import('./features/account/routes').then((routes) => routes.accoutRoutes),
+  },
   { path: 'test-error', component: TestError },
   { path: 'server-error', component: ServerError },
   { path: 'not-found', component: NotFound },
-  { path: 'admin', component: Admin, canActivate: [authGuard, adminGuard] },
+  // In case of a single route that we want to use the lazy loading on we do not have to create a routes.ts file but d oit directly here:
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin').then((component) => component.Admin),
+    canActivate: [authGuard, adminGuard],
+  },
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' },
 ];

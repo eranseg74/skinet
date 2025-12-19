@@ -1,27 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { OrderService } from '../../../core/services/order-service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Order } from '../../../shared/models/order';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { AddressPipe } from '../../../shared/pipes/address-pipe';
 import { PaymentPipe } from '../../../shared/pipes/payment-pipe';
-import { MatIcon } from '@angular/material/icon';
 import { AccountService } from '../../../core/services/account-service';
 import { AdminService } from '../../../core/services/admin-service';
 
 @Component({
   selector: 'app-order-detailed',
-  imports: [
-    MatCardModule,
-    MatButtonModule,
-    DatePipe,
-    CurrencyPipe,
-    AddressPipe,
-    PaymentPipe,
-    RouterLink,
-  ],
+  imports: [MatCardModule, MatButtonModule, DatePipe, CurrencyPipe, AddressPipe, PaymentPipe],
   templateUrl: './order-detailed.html',
   styleUrl: './order-detailed.scss',
 })

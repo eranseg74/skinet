@@ -44,6 +44,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 });
 
 builder.Services.AddSingleton<ICartService, CartService>();
+builder.Services.AddSingleton<IResponseCacheService, ResponseCacheService>();
 
 // Adding services for Identity Framework
 builder.Services.AddAuthorization();

@@ -65,3 +65,8 @@ The approach is to host all the client assets (all the javascript, css, and html
    This will put all the static files created from the ng build command under this folder
 3) If there are delays in the code that were defined for development needs, either remove it, or set it to be relevant only in development by checking the <environment.production> expression which returns `true` if we are in production, and `false` if we are in development mode. If you need to create an empty function (a function that does nothing) you can use the <identity> which is a function that does nothing (like delay(0)).
 4) When running ng build, if you get an error that the file limit was crossed you can change the file limit in the Angular.json file under the [configurations] -> [production] -> [budgets] and change the [maximumError] to a higher value.The ideal is to keep it low for performance.
+
+# Lazy loading
+When we run ng build we can see in the `Initial total` line the size of files that the user's brwoser is going to load each time it runs the application. This might be heavy and we could use the Lazy loading approach to define some components that will be load later and not on initiation. For example, in this app - the checkout and order components could be fetched later and not immediatelly on application start. For sure, as an administrator, this data is not required.
+
+## Implementing Lazy loading

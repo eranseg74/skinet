@@ -1,3 +1,4 @@
+using API.RequestHelpers;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
@@ -14,7 +15,8 @@ namespace API.Controllers;
 // Because the IGenericRepository is a generic interface, it can be reused for different entities, promoting code reusability and separation of concerns. We set it up specifically for the Product entity in this controller.
 public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
 {
-  // When a request is made to "api/products", this method will be invoked. The request comes as a thread and the method is asynchronous to avoid blocking the thread while waiting for the database operation to complete. 
+  // When a request is made to "api/products", this method will be invoked. The request comes as a thread and the method is asynchronous to avoid blocking the thread while waiting for the database operation to complete.
+  [Cache(600)] // Caching the response for 600 seconds (10 minutes)
   [HttpGet] // This attribute indicates that this action method responds to HTTP GET requests.
   // The Task<ActionResult<IEnumerable<string>>> indicates that this method is asynchronous and returns an ActionResult containing an IEnumerable of strings. ActionResult is a base class for HTTP responses in ASP.NET Core, allowing for various response types (like Ok, NotFound, etc.).
   // The Task part indicates that this method is asynchronous and can be awaited.
@@ -28,6 +30,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     return await CreatePagedResult(unitOfWork.Repository<Product>(), spec, specParams.PageIndex, specParams.PageSize);
   }
 
+  [Cache(600)]
   [HttpGet("{id:int}")] // This attribute indicates that this action method responds to HTTP GET requests with an integer parameter in the URL. // api/products/3
   public async Task<ActionResult<Product>> GetProduct(int id)
   {
@@ -39,6 +42,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     return product;
   }
 
+  [InvalidateCache("api/products|")]
   [Authorize(Roles = "Admin")]
   [HttpPost]
   public async Task<ActionResult<Product>> CreateProduct(Product product)
@@ -54,6 +58,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     return BadRequest("Problem creating product");
   }
 
+  [InvalidateCache("api/products|")]
   [Authorize(Roles = "Admin")]
   [HttpPut("{id:int}")]
   public async Task<ActionResult> UpdateProduct(int id, Product product)
@@ -74,6 +79,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     //return NoContent(); // Standard response for a successful PUT request that doesn't return any content.
   }
 
+  [InvalidateCache("api/products|")]
   [Authorize(Roles = "Admin")]
   [HttpDelete("{id:int}")]
   public async Task<ActionResult> DeleteProduct(int id)
@@ -91,6 +97,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     return BadRequest("Problem with deleting the product");
   }
 
+  [Cache(10000)]
   [HttpGet("brands")]
   public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
   {
@@ -99,6 +106,7 @@ public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
   }
 
+  [Cache(10000)]
   [HttpGet("types")]
   public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
   {
