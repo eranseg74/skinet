@@ -11,13 +11,13 @@
         <div class="mt-4 items-center gap-4 flex">
           <p class="text-3xl font-extrabold text-gray-900">{{ product()?.price | currency }}</p>
         </div>
-        <div class="flex gap-4 mt-6">
+        <div class="flex items-start gap-4 mt-6">
           <!-- Disabling the button if there is no change - The user did not add or remove (changed the quantity) -->
           <button
             [disabled]="quantity === quantityInCart"
             (click)="updateCart()"
             mat-flat-button
-            class="match-input-height"
+            class="h-14"
           >
             <mat-icon>shopping_cart</mat-icon>
             {{ getButtonText() }}

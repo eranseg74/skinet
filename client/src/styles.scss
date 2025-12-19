@@ -6,8 +6,6 @@
     (
       filled-container-shape: '6px',
       outlined-container-shape: '6px',
-      filled-container-color: #943bf3,
-      text-label-text-color: #fff,
     )
   );
   @include mat.badge-overrides(
