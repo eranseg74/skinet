@@ -32,13 +32,29 @@
     }
   </div>
   <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
-    <form class="space-y-2 flex flex-col p-2">
+    <form #form="ngForm" (ngSubmit)="applyCouponCode()" class="space-y-2 flex flex-col p-2">
       <label class="mb-2 block text-sm font-medium">Do you have a voucher code?</label>
+      @if (cartSrvice.cart()?.coupon; as coupon) {
+      <div class="flex justify-between items-center">
+        <span class="text-sm font-semibold">{{ coupon.name }} applied</span>
+        <button (click)="removeCouponCode()" mat-icon-button>
+          <mat-icon class="text-amber-800">delete</mat-icon>
+        </button>
+      </div>
+      }
       <mat-form-field appearance="outline">
         <mat-label>Voucher code</mat-label>
-        <input type="text" matInput />
+        <input
+          name="code"
+          [disabled]="!!cartSrvice.cart()?.coupon"
+          [(ngModel)]="code"
+          type="text"
+          matInput
+        />
       </mat-form-field>
-      <button class="matb" mat-flat-button>Apply code</button>
+      <button [disabled]="!!cartSrvice.cart()?.coupon" type="submit" mat-flat-button>
+        Apply code
+      </button>
     </form>
   </div>
 </div>

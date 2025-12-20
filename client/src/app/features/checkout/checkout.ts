@@ -204,6 +204,7 @@ export class Checkout implements OnInit, OnDestroy {
       },
       shippingAddress, // Returning the shipping address as an object, as is. No need to specify the properties in this case
       deliveryMethodId: cart.deliveryMethodId,
+      discount: this.cartService.totals()?.discount,
     };
     return order;
   }

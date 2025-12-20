@@ -135,12 +135,15 @@ export class StripeService {
 
   createOrUpdatePaymentIntent() {
     const cart = this.cartService.cart();
+    const hasClientSecret = !!cart?.clientSecret;
     if (!cart) throw new Error('Problem with cart');
     // Form the next call we will get the cart with the paymentId and the ClientSecret
     return this.http.post<Cart>(this.baseUrl + 'payments/' + cart.id, {}).pipe(
-      map((cart) => {
-        // In the cart service we have the setCart which updates the cart in the Redis DB, and the set function that sets the cart signal. Here we use the setCart function because it also updates the Redis DB
-        this.cartService.setCart(cart);
+      map(async (cart) => {
+        if (!hasClientSecret) {
+          // In the cart service we have the setCart which updates the cart in the Redis DB, and the set function that sets the cart signal. Here we use the setCart function because it also updates the Redis DB
+          await firstValueFrom(this.cartService.setCart(cart));
+        }
         return cart;
       })
     );

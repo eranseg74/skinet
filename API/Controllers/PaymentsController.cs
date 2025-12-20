@@ -66,17 +66,19 @@ public class PaymentsController(IPaymentService paymentService, IUnitOfWork unit
 
   private async Task HandlePaymentIntentSucceeded(PaymentIntent intent) // Not returning anything. This is just a Task
   {
-    Console.WriteLine("Before succeeded check");
     if (intent.Status == "succeeded")
     {
-      Console.WriteLine("After succeeded check");
       // Adding true (or false) as the second parameter (it does not matter which value because we are not using this parameter) ensures that we will use the correct constructor
       var spec = new OrderSpecification(intent.Id, true);
       // Specifying the full path in order not to mix it with the Order in the Stripe namespace
       var order = await unitOfWork.Repository<Core.Entities.OrderAggregate.Order>().GetEntityWithSpecAsync(spec) ?? throw new Exception("Order not found");
+
+      // Certain order amounts may cause a rounding difference when comparing the Order amount to the Intent amount.This function if added to the webhook will ensure that the amounts are using the same roundin method
+      var orderTotalInCents = (long)Math.Round(order.GetTotal() * 100, MidpointRounding.AwayFromZero);
+
       // Checking if the total price in the order matches what the user paid in Stripe
       // We multiply the total number by 100 because the last 2 digits are considered as the 2 digits on the right side of the decimal point. For example - total of 12345 is equal to an amount of 123.45
-      if ((long)order.GetTotal() * 100 != intent.Amount)
+      if (orderTotalInCents != intent.Amount)
       {
         order.Status = OrderStatus.PaymentMismatch;
       }

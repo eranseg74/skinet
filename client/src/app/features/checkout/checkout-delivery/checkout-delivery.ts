@@ -4,6 +4,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { CurrencyPipe } from '@angular/common';
 import { CartService } from '../../../core/services/cart-service';
 import { DeliveryMethod } from '../../../shared/models/deliveryMethod';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-checkout-delivery',
@@ -32,12 +33,12 @@ export class CheckoutDelivery implements OnInit {
     }); // Subscribing here so we will populate the delivery methods inside the service
   }
 
-  updateDeliveryMethod(method: DeliveryMethod) {
+  async updateDeliveryMethod(method: DeliveryMethod) {
     this.cartService.selectedDelivery.set(method);
     const cart = this.cartService.cart();
     if (cart) {
       cart.deliveryMethodId = method.id;
-      this.cartService.setCart(cart); // This will also update our Redis DB
+      await firstValueFrom(this.cartService.setCart(cart)); // This will also update our Redis DB
       this.deliveryComplete.emit(true); // Also emitting the deliveryComplete as true on each delivery method update
     }
   }

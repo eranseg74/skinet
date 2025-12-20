@@ -18,6 +18,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
       o => Enum.Parse<OrderStatus>(o) // Insteadof o => (OrderStatus)Enum.Parse(typeof(OrderStatus), o)
     );
     builder.Property(x => x.Subtotal).HasColumnType("decimal(18,2)");
+    builder.Property(x => x.Discount).HasColumnType("decimal(18,2)");
     // Specifying that one order may have many order items, with the Delete behavior as cascade, which means that deleting an order will delete all of its order items
     builder.HasMany(x => x.OrderItems).WithOne().OnDelete(DeleteBehavior.Cascade);
     // Specifying the Date conversion because SQLServer does not save UTC format although we are sending it to the DB in a UTC format, so we need to make sure to treat what we get from SQL as UTC:

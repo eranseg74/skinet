@@ -52,7 +52,8 @@ public class OrdersController(ICartService cartService, IUnitOfWork unitOfWork) 
       Subtotal = items.Sum(x => x.Price * x.Quantity),
       PaymentSummary = createOrderDto.PaymentSummary,
       PaymentIntentId = cart.PaymentIntentId,
-      BuyerEmail = email
+      BuyerEmail = email,
+      Discount = createOrderDto.Discount
     };
     unitOfWork.Repository<Order>().Add(order);
     if (await unitOfWork.Complete())

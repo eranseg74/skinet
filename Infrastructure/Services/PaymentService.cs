@@ -2,24 +2,16 @@ using Core.Entities;
 using Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Stripe;
+using Stripe.V2;
 
 namespace Infrastructure.Services;
 
-public class PaymentService : IPaymentService
+public class PaymentService(IConfiguration config, ICartService cartService,
+      IUnitOfWork unit) : IPaymentService
 {
-  private readonly ICartService cartService;
-  private readonly IUnitOfWork unit;
-
-  public PaymentService(IConfiguration config, ICartService cartService,
-      IUnitOfWork unit)
-  {
-    StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
-    this.cartService = cartService;
-    this.unit = unit;
-  }
-
   public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
   {
+    StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
     var cart = await cartService.GetCartAsync(cartId)
         ?? throw new Exception("Cart unavailable");
 
@@ -29,6 +21,11 @@ public class PaymentService : IPaymentService
 
     var subtotal = CalculateSubtotal(cart);
 
+    if (cart.Coupon != null)
+    {
+      subtotal = await ApplyDiscountAsync(cart.Coupon, subtotal);
+    }
+
     var total = subtotal + shippingPrice;
 
     await CreateUpdatePaymentIntentAsync(cart, total);
@@ -36,6 +33,22 @@ public class PaymentService : IPaymentService
     await cartService.SetCartAsync(cart);
 
     return cart;
+  }
+
+  private async Task<long> ApplyDiscountAsync(AppCoupon appCoupon, long subtotal)
+  {
+    var couponService = new Stripe.CouponService();
+    var coupon = await couponService.GetAsync(appCoupon.CouponId);
+    if (coupon.AmountOff.HasValue)
+    {
+      subtotal -= (long)coupon.AmountOff * 100;
+    }
+    if (coupon.PercentOff.HasValue)
+    {
+      var discount = subtotal * (coupon.PercentOff.Value / 100);
+      subtotal -= (long)discount;
+    }
+    return subtotal;
   }
 
   public async Task<string> RefundPayment(string paymentIntentId)

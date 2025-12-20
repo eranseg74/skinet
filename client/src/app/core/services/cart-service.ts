@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Cart } from '../../shared/models/cart';
+import { Cart, Coupon } from '../../shared/models/cart';
 import { CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map } from 'rxjs';
+import { firstValueFrom, map, Observable, tap } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 
 @Injectable({
@@ -27,13 +27,22 @@ export class CartService {
     const delivery = this.selectedDelivery();
     if (!cart) return null;
     const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    let discountValue = 0;
+    if (cart.coupon) {
+      if (cart.coupon.amountOff) {
+        discountValue = cart.coupon.amountOff;
+      } else if (cart.coupon.percentOff) {
+        discountValue = subtotal * (cart.coupon.percentOff / 100);
+      }
+    }
     const shipping = delivery ? delivery.price : 0;
-    const discount = 0;
+    const total = subtotal + shipping - discountValue;
+
     return {
       subtotal,
       shipping,
-      discount,
-      total: subtotal + shipping - discount,
+      discount: discountValue,
+      total,
     };
   });
 
@@ -49,20 +58,20 @@ export class CartService {
   }
 
   setCart(cart: Cart) {
-    return this.http.post<Cart>(this.baseUrl + 'cart', cart).subscribe({
-      next: (cart) => this.cart.set(cart),
-    });
+    return this.http
+      .post<Cart>(this.baseUrl + 'cart', cart)
+      .pipe(tap((cart) => this.cart.set(cart)));
   }
 
   // Since the method can get either a Product or a CartItem we will check and if it is a product we will map it to a cart item in order to work only on cart items
-  addItemToCart(item: CartItem | Product, quantity = 1) {
+  async addItemToCart(item: CartItem | Product, quantity = 1) {
     const cart = this.cart() ?? this.createCart();
     if (this.isProduct(item)) {
       item = this.mapProductToCartItem(item);
     }
     // Passing the items array, the item that we want to add or update (incase it already exists) and the quantity to add
     cart.items = this.addOrUpdateItem(cart.items, item, quantity);
-    this.setCart(cart); // Setting the cart in the DB
+    await firstValueFrom(this.setCart(cart)); // Setting the cart in the DB
   }
 
   private addOrUpdateItem(items: CartItem[], item: CartItem, quantity: number): CartItem[] {
@@ -76,7 +85,7 @@ export class CartService {
     return items;
   }
 
-  removeItemFromCart(productId: number, quantity: number = 1) {
+  async removeItemFromCart(productId: number, quantity: number = 1) {
     const cart = this.cart();
     if (!cart) return; // exiting from the function without doing anything
     const index = cart.items.findIndex((x) => x.productId === productId);
@@ -90,7 +99,7 @@ export class CartService {
         // In case there are no more products in the cart
         this.deleteCart();
       } else {
-        this.setCart(cart); // Updating the cart on the Redis server
+        await firstValueFrom(this.setCart(cart)); // Updating the cart on the Redis server
       }
     }
   }
@@ -103,6 +112,10 @@ export class CartService {
         this.cart.set(null);
       },
     });
+  }
+
+  applyDiscount(code: string): Observable<Coupon> {
+    return this.http.get<Coupon>(this.baseUrl + 'coupons/' + code);
   }
 
   // private mapProductToCartItem(item: Product): CartItem | Product { // Removing the Product option because we will return only a CartItem

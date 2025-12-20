@@ -15,6 +15,7 @@ public class Order : BaseEntity, IDtoConertible
   public required string PaymentIntentId { get; set; }
   public decimal GetTotal()
   {
-    return Subtotal + DeliveryMethod.Price;
+    return Subtotal - Discount + DeliveryMethod.Price;
   }
+  public decimal Discount { get; set; }
 }
