@@ -79,6 +79,7 @@ app.MapGroup("api").MapIdentityApi<AppUser>(); // The MapGroup allows to add tex
 
 app.MapHub<NotificationHub>("/hub/notifications"); // Maps incoming requests with the specified path to the specified Microsoft.AspNetCore.SignalR.Hub type.
 
+// The dotnet application is responsible for handling the requests that are not handled by the API controllers. This is done by mapping a fallback controller that will handle all the requests that are not handled by the API controllers. In this case, we are mapping the FallbackController and its Index action. This controller will serve the index.html file of the Angular application for any request that is not handled by the API controllers. This is necessary for client-side routing to work in the Angular application. When the user navigates to a route in the Angular application, the request will be sent to the server, and if there is no matching API controller, the fallback controller will serve the index.html file, allowing the Angular application to handle the routing on the client side.
 app.MapFallbackToController("Index", "Fallback");
 // Seeding data if needed (adding initial data to the database in case it is empty)
 try

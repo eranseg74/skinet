@@ -24,7 +24,7 @@ public class StoreContextSeed
     if (!context.Products.Any())
     {
       // Read the JSON file containing the seed data for products. Using the path relative to the project structure. We are specifying the path although we are in the same folder because for later when we will deploy the application.
-      var productsData = File.ReadAllText(path + @"/Data/SeedData/products.json");
+      var productsData = await File.ReadAllTextAsync(path + @"/Data/SeedData/products.json");
       var products = JsonSerializer.Deserialize<List<Product>>(productsData);
       if (products != null)
       {
@@ -37,7 +37,7 @@ public class StoreContextSeed
     if (!context.DeliveryMethods.Any())
     {
       // Read the JSON file containing the seed data for delivery methods. Using the path relative to the project structure. We are specifying the path although we are in the same folder because for later when we will deploy the application.
-      var deliveryMethodsData = File.ReadAllText(path + @"/Data/SeedData/delivery.json");
+      var deliveryMethodsData = await File.ReadAllTextAsync(path + @"/Data/SeedData/delivery.json");
       var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodsData);
       if (deliveryMethods != null)
       {

@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const busyService = inject(BusyService);
   busyService.busy();
-  // When we are in production we do not want the delay so we are checking if the environment is production. If so we use the identity function which does nothing
+  // When we are in production we do not want the delay so we are checking if the environment is production. If so we use the identity function which does nothing. We do this because we cannot return null or undefined from the pipe. We need to return an observable operator so we use identity.
   return next(req).pipe(
     environment.production ? identity : delay(500),
     finalize(() => busyService.idle())
